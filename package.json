@@ -9,10 +9,13 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:ui": "vitest --ui",
-    "prepare": "husky install"
+    "prepare": "husky",
+    "lint": "eslint . --ext .vue,.ts,.js",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "pinia": "^3.0.3",
+    "uuid": "^11.1.0",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"
   },
@@ -25,6 +28,9 @@
     "@vue/tsconfig": "^0.7.0",
     "cypress": "^14.5.1",
     "eslint": "^9.30.1",
+    "eslint-define-config": "^2.1.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-prettier": "^5.5.1",
     "eslint-plugin-vue": "^10.2.0",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
@@ -33,6 +39,7 @@
     "typescript": "~5.8.3",
     "vite": "^7.0.0",
     "vitest": "^3.2.4",
+    "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^2.2.10"
   }
 }
