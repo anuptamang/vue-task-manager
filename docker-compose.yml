@@ -1,4 +1,4 @@
-version: '3'
+# docker-compose.yml
 services:
   vue-task-manager:
     build: .
@@ -7,3 +7,5 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    environment:
+      - NODE_ENV=development

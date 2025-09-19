@@ -4,5 +4,5 @@ export interface Task {
   description: string;
   status: 'todo' | 'in-progress' | 'done';
   priority: 'low' | 'medium' | 'high';
-  dueDate: string; // ISO format
+  dueDate: string;
 }

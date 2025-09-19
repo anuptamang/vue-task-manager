@@ -1,8 +1,8 @@
-<!-- src/App.vue -->
 <template>
   <router-view />
+  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">
-// No setup yet
+import ConfirmDialog from 'primevue/confirmdialog';
 </script>

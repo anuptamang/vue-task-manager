@@ -18,3 +18,18 @@ test:
 
 e2e:
 	npx cypress open
+
+up:
+	docker compose up --build
+
+no-cache:
+	docker compose build --no-cache
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f
+
+bash:
+	docker compose exec vue-task-manager sh
