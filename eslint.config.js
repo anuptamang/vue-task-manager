@@ -1,5 +1,5 @@
 // eslint.config.js
-import vue from 'eslint-plugin-vue';
+import eslintPluginVue from 'eslint-plugin-vue';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettier from 'eslint-plugin-prettier';
@@ -19,7 +19,7 @@ export default defineConfig([
       },
     },
     plugins: {
-      vue,
+      eslintPluginVue,
       prettier,
     },
     rules: {

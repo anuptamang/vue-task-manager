@@ -36,15 +36,17 @@ It allows you to create, edit, delete, filter, and sort tasks with a modern UI i
 - [Quill](https://quilljs.com/) (rich-text editor for task description)
 
 ---
+## Project Preview 
+[Preview URL](https://vue-task-manager-omega.vercel.app/)
 
 ## 🛠️ Project Setup
 
 ### 1. Clone repository
 ```bash
-git clone https://github.com/your-username/my-keep.git
-cd my-keep
+git clone https://github.com/anuptamang/vue-task-manager.git
 
 ### 2. With Docker
+Start Docker Desktop
 
 # Start development server in Docker
 make dev

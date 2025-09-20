@@ -9,7 +9,6 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:ui": "vitest --ui",
-    "prepare": "husky",
     "lint": "eslint . --ext .vue,.ts,.js",
     "format": "prettier --write ."
   },
