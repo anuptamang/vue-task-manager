@@ -48,24 +48,10 @@ git clone https://github.com/anuptamang/vue-task-manager.git
 ### 2. With Docker
 Start Docker Desktop
 
-# Start development server in Docker
-make dev
-
-# Build production image
-make build
-
 # Run container with hot reload
 make up
 
 # Stop running container
 make down
 
-# View logs
-make logs
-
-# Open container shell
-make bash
-
-# Rebuild without cache
-make no-cache
 ```
