@@ -41,8 +41,8 @@ It allows you to create, edit, delete, filter, and sort tasks with a modern UI i
 
 ## 🛠️ Project Setup
 
-### 1. Clone repository
 ```bash
+### 1. Clone repository
 git clone https://github.com/anuptamang/vue-task-manager.git
 
 ### 2. With Docker
@@ -68,3 +68,4 @@ make bash
 
 # Rebuild without cache
 make no-cache
+```
