@@ -1,3 +1,4 @@
+// src/views/pages/TaskList.vue
 <template>
   <div class="hold">
     <h1>Task List</h1>
@@ -41,7 +42,7 @@
     </div>
 
     <div class="pt-[20px]">
-      <div v-if="filteredAndSortedTasks.length > 0" class="columns-3">
+      <div v-if="filteredAndSortedTasks?.length > 0" class="columns-3">
         <TaskCard
           v-for="task in filteredAndSortedTasks"
           :key="task.id"
@@ -49,23 +50,27 @@
         />
       </div>
 
-      <div v-else class="text-gray-500 py-10">
-        <i class="pi pi-inbox text-4xl mb-4"></i>
-        <p>No tasks!</p>
+      <div v-else class="text-gray-500 py-10 columns-3">
+        <div class="">
+          <p>No tasks!</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useTaskStore } from '../../store/taskStore';
 import TaskCard from '../../components/TaskCard.vue';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 
 const store = useTaskStore();
-store.loadTasks();
+
+onMounted(() => {
+  store.loadTasks();
+});
 
 /** Reactive list of tasks from Pinia store */
 const tasks = computed(() => store.tasks);

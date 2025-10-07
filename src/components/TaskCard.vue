@@ -1,10 +1,3 @@
-/** 
- * TaskCard Component
- * Displays a single task inside a PrimeVue Card with:
- * - Title, status, priority, due date, description
- * - Context menu with Edit + Delete
- * - Edit opens dialog with TaskCardForm
- */
 <template>
   <Card
     class="shadow-md border-round surface-card mb-[20px] break-inside-avoid"
@@ -17,7 +10,10 @@
         <div class="flex gap-[8px]">
           <Tag :value="statusLabel" :severity="statusSeverity" />
           <Tag
-            v-if="['todo', 'in-progress'].includes(task.status) && isDueSoonOrOverdue"
+            v-if="
+              ['todo', 'in-progress'].includes(task.status) &&
+              isDueSoonOrOverdue
+            "
             severity="danger"
             :value="isPastDue ? 'Overdue' : 'Due Soon'"
           />
@@ -26,12 +22,16 @@
     </template>
 
     <template #content>
-      <p><b>Status:</b> <span class="capitalize">{{ task.status }}</span></p>
+      <p>
+        <b>Status:</b> <span class="capitalize">{{ task.status }}</span>
+      </p>
       <p>
         <b>Priority:</b>
         <Tag :value="priorityLabel" :severity="prioritySeverity" class="ml-2" />
       </p>
-      <p><b>Due:</b> <span>{{ formattedDueDate }}</span></p>
+      <p>
+        <b>Due:</b> <span>{{ formattedDueDate }}</span>
+      </p>
       <p><b>Description:</b></p>
       <div v-html="task.description" class="prose"></div>
     </template>
@@ -52,6 +52,7 @@
     </template>
   </Card>
 
+  <!-- Edit Dialog -->
   <Dialog
     v-model:visible="dialogVisible"
     :header="`Edit Task: ${task.title}`"
@@ -62,9 +63,37 @@
       :task="editableTask"
       name="TaskEdit"
       :isEdit="true"
-      @save="saveEdit"
       @cancel="dialogVisible = false"
     />
+  </Dialog>
+
+  <!-- Custom Delete Dialog -->
+  <Dialog
+    v-model:visible="deleteDialogVisible"
+    header="Confirm Delete"
+    modal
+    style="width: 400px"
+  >
+    <p>
+      Are you sure you want to delete
+      <strong>"{{ task.title }}"</strong>?
+    </p>
+    <template #footer>
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        @click="deleteDialogVisible = false"
+        :disabled="deleting"
+      />
+      <Button
+        label="Delete"
+        icon="pi pi-trash"
+        severity="danger"
+        :loading="deleting"
+        @click="confirmDelete"
+      />
+    </template>
   </Dialog>
 </template>
 
@@ -74,7 +103,6 @@ import Card from 'primevue/card';
 import Dialog from 'primevue/dialog';
 import Menu from 'primevue/menu';
 import Tag from 'primevue/tag';
-import { useConfirm } from 'primevue/useconfirm';
 import { computed, ref } from 'vue';
 import TaskCardForm from '../components/TaskCardForm.vue';
 import { useTaskStore } from '../store/taskStore';
@@ -82,60 +110,45 @@ import type { Task } from '../store/taskStore';
 
 const props = defineProps<{ task: Task }>();
 const store = useTaskStore();
-const confirm = useConfirm();
 
 const menuRef = ref();
 const dialogVisible = ref(false);
+const deleteDialogVisible = ref(false);
+const deleting = ref(false);
 
-/** Editable copy of the task */
 const editableTask = ref<Task>({ ...props.task });
 
-/** 
- * Open context menu.
- * @param {MouseEvent} event - Menu toggle event
- */
 const toggleMenu = (event: MouseEvent) => {
   menuRef.value.toggle(event);
 };
 
-/** 
- * Open edit dialog with current task prefilled. 
- */
 const editTask = () => {
   editableTask.value = { ...props.task };
   dialogVisible.value = true;
 };
 
-/**
- * Save task changes and update store.
- */
-const saveEdit = () => {
-  store.updateTask(editableTask.value);
-  dialogVisible.value = false;
-};
-
-/**
- * Show confirmation and delete task from store.
- */
+// Open delete dialog
 const deleteTask = () => {
-  confirm.require({
-    message: `Are you sure you want to delete "${props.task.title}"?`,
-    header: 'Confirm Delete',
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: 'p-button-danger',
-    acceptLabel: 'Delete',
-    rejectLabel: 'Cancel',
-    accept: () => store.deleteTask(props.task.id),
-  });
+  deleteDialogVisible.value = true;
 };
 
-/** Menu options */
+// Actually delete
+const confirmDelete = async () => {
+  deleting.value = true;
+  try {
+    await store.deleteTask(props.task.id);
+    deleteDialogVisible.value = false;
+  } finally {
+    deleting.value = false;
+  }
+};
+
 const menuItems = [
   { label: 'Edit', icon: 'pi pi-pencil', command: editTask },
   { label: 'Delete', icon: 'pi pi-trash', command: deleteTask },
 ];
 
-/** Formatted due date (YYYY-MM-DD) */
+/** Date / status computed props... (same as before) **/
 const formattedDueDate = computed(() => {
   if (!props.task.dueDate) return '—';
   const date = new Date(props.task.dueDate);
@@ -143,29 +156,20 @@ const formattedDueDate = computed(() => {
 });
 
 const now = new Date();
-/** Parsed due date */
 const dueDate = computed(() =>
-  props.task.dueDate ? new Date(props.task.dueDate) : null
+  props.task.dueDate ? new Date(props.task.dueDate) : null,
 );
 
-/** Whether task is overdue */
 const isPastDue = computed(
-  () => dueDate.value && dueDate.value.getTime() < now.getTime()
+  () => dueDate.value && dueDate.value.getTime() < now.getTime(),
 );
-
-/** Whether task is due within 24h */
 const isNearDue = computed(() => {
   if (!dueDate.value) return false;
   const diff = dueDate.value.getTime() - now.getTime();
   return diff > 0 && diff <= 24 * 60 * 60 * 1000;
 });
+const isDueSoonOrOverdue = computed(() => isNearDue.value || isPastDue.value);
 
-/** Whether task is near due or overdue */
-const isDueSoonOrOverdue = computed(
-  () => isNearDue.value || isPastDue.value
-);
-
-/** Severity style for task status */
 const statusSeverity = computed(() => {
   if (props.task.status === 'done') return 'success';
   if (props.task.status === 'in-progress') return 'warn';
@@ -174,7 +178,6 @@ const statusSeverity = computed(() => {
   return 'secondary';
 });
 
-/** Label for task status */
 const statusLabel = computed(() => {
   switch (props.task.status) {
     case 'todo':
@@ -188,17 +191,18 @@ const statusLabel = computed(() => {
   }
 });
 
-/** CSS border class for status */
 const statusClass = computed(() => {
   if (props.task.status === 'done') return 'border-green-400';
   if (props.task.status === 'in-progress') return 'border-yellow-400';
-  if (isDueSoonOrOverdue.value && ['todo', 'in-progress'].includes(props.task.status))
+  if (
+    isDueSoonOrOverdue.value &&
+    ['todo', 'in-progress'].includes(props.task.status)
+  )
     return 'border-red-500';
   if (props.task.status === 'todo') return 'border-blue-400';
   return 'border-gray-300';
 });
 
-/** Severity style for priority */
 const prioritySeverity = computed(() => {
   switch (props.task.priority) {
     case 'low':
@@ -212,7 +216,6 @@ const prioritySeverity = computed(() => {
   }
 });
 
-/** Label for task priority */
 const priorityLabel = computed(() => {
   switch (props.task.priority) {
     case 'low':
@@ -226,22 +229,3 @@ const priorityLabel = computed(() => {
   }
 });
 </script>
-
-<style scoped>
-.Card {
-  border: 2px solid transparent;
-}
-.border-green-400 {
-  border: 2px solid #22c55e !important;
-}
-.border-yellow-400 {
-  border: 2px solid #facc15 !important;
-}
-.border-blue-400 {
-  border: 2px solid #3b82f6 !important;
-}
-.border-red-500 {
-  border: 2px solid #ef4444 !important;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-}
-</style>

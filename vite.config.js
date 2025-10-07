@@ -5,6 +5,9 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
   plugins: [vue(), VueDevTools()],
+  ssr: {
+    noExternal: ['primevue', '@primeuix/themes/aura', 'quill'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -15,7 +18,7 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    port: 5173, 
+    port: 5173,
   },
   test: {
     include: ['tests/unit/**/*.spec.ts'],
