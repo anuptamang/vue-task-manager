@@ -2,7 +2,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-// Import type from Prisma (after you generated client)
 import type { Task } from '../../generated/prisma';
 
 export const useTaskStore = defineStore('taskStore', () => {
