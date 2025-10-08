@@ -34,6 +34,8 @@ It allows you to create, edit, delete, filter, and sort tasks with a modern UI i
 - [PrimeVue](https://primevue.org/) (UI components)
 - [PrimeIcons](https://primefaces.org/primeicons/) (icons)
 - [Quill](https://quilljs.com/) (rich-text editor for task description)
+- [Prisma](https://www.prisma.io/) (ORM for database interactions)
+- [PostgreSQL](https://www.prisma.io/) (Prisma cloud database)
 
 ---
 
