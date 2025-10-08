@@ -39,10 +39,6 @@ It allows you to create, edit, delete, filter, and sort tasks with a modern UI i
 
 ---
 
-## Project Preview
-
-[Preview URL](https://vue-task-manager-omega.vercel.app/)
-
 ## 🛠️ Project Setup
 
 ```bash
