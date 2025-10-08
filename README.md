@@ -36,7 +36,9 @@ It allows you to create, edit, delete, filter, and sort tasks with a modern UI i
 - [Quill](https://quilljs.com/) (rich-text editor for task description)
 
 ---
-## Project Preview 
+
+## Project Preview
+
 [Preview URL](https://vue-task-manager-omega.vercel.app/)
 
 ## 🛠️ Project Setup
@@ -53,5 +55,20 @@ make up
 
 # Stop running container
 make down
+
+### 2. Without Docker
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+
 
 ```

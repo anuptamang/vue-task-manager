@@ -192,15 +192,14 @@ const statusLabel = computed(() => {
 });
 
 const statusClass = computed(() => {
-  if (props.task.status === 'done') return 'border-green-400';
-  if (props.task.status === 'in-progress') return 'border-yellow-400';
+  if (props.task.status === 'done') return 'border border-green-400';
+  if (props.task.status === 'in-progress') return 'border border-yellow-400';
   if (
     isDueSoonOrOverdue.value &&
     ['todo', 'in-progress'].includes(props.task.status)
-  )
-    return 'border-red-500';
-  if (props.task.status === 'todo') return 'border-blue-400';
-  return 'border-gray-300';
+  ) return 'border border-red-500';
+  if (props.task.status === 'todo') return 'border border-blue-400';
+  return 'border border-gray-300';
 });
 
 const prioritySeverity = computed(() => {
@@ -229,3 +228,26 @@ const priorityLabel = computed(() => {
   }
 });
 </script>
+
+<style>
+/* Gray */
+.border-gray-300 { border-color: #d1d5db; }
+.border-gray-400 { border-color: #9ca3af; }
+.border-gray-500 { border-color: #6b7280; }
+
+/* Red */
+.border-red-400  { border-color: #f87171; }
+.border-red-500  { border-color: #ef4444; }
+
+/* Yellow */
+.border-yellow-400 { border-color: #facc15; }
+.border-yellow-500 { border-color: #eab308; }
+
+/* Green */
+.border-green-400 { border-color: #4ade80; }
+.border-green-500 { border-color: #22c55e; }
+
+/* Blue */
+.border-blue-400  { border-color: #60a5fa; }
+.border-blue-500  { border-color: #3b82f6; }
+</style>
