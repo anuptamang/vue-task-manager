@@ -1,57 +1,11 @@
-<template>
-  <div class="app-layout w-[992px] px-5 mx-auto">
-    <Menubar :model="menuItems">
-      <template #start>
-        <h1 class="text-xl font-bold pr-[100px]">My Keep</h1>
-      </template>
-
-      <template #item="{ item, props }">
-        <router-link
-          v-if="item.to"
-          v-slot="{ href, navigate }"
-          :to="item.to"
-          custom
-        >
-          <a :href="href" v-bind="props.action" @click="navigate">
-            <span :class="item.icon" class="mr-2" />
-            <span>{{ item.label }}</span>
-          </a>
-        </router-link>
-
-        <a v-else :href="item.url" v-bind="props.action">
-          <span :class="item.icon" class="mr-2" />
-          <span>{{ item.label }}</span>
-        </a>
-      </template>
-    </Menubar>
-
-    <main class="pt-[30px]">
-      <router-view />
-    </main>
-
-    <Divider />
-    <footer class="text-center text-sm text-gray-600 py-3">
-      <p>&copy; {{ currentYear }} My Keep</p>
-    </footer>
-  </div>
-
-  <Dialog v-model:visible="dialogVisible" header="Create Task" modal style="width: 500px">
-    <TaskCardForm
-      :task="task"
-      :isEdit="false"
-      @save="saveTask"
-      @cancel="dialogVisible = false"
-    />
-  </Dialog>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
-import Menubar from 'primevue/menubar';
-import Divider from 'primevue/divider';
-import Dialog from 'primevue/dialog';
-import TaskCardForm from '../../components/TaskCardForm.vue';
-import { useTaskStore, type Task } from '../../store/taskStore';
+import { Divider, Dialog } from 'primevue';
+import Header from '../../components/Header.vue';
+import Footer from '../../components/Footer.vue';
+import TaskCardForm from '../../components/TaskCard/TaskCardForm.vue';
+import { useTaskStore } from '../../store/taskStore';
+import type { Task } from '../../../generated/prisma';
 import { v4 as uuidv4 } from 'uuid';
 
 const store = useTaskStore();
@@ -84,12 +38,35 @@ const saveTask = (newTask: Task) => {
   store.addTask(newTask);
   dialogVisible.value = false;
 };
-
-const menuItems = ref([
-  { label: 'Home', icon: 'pi pi-home', to: '/' },
-  { label: 'Create Task', icon: 'pi pi-plus', command: createTask },
-]);
 </script>
+
+<template>
+  <div class="app-layout w-[992px] px-5 mx-auto">
+    <Header appTitle="My Keep" @create-task="createTask" />
+
+    <main class="pt-[30px]">
+      <router-view />
+    </main>
+
+    <Divider />
+
+    <Footer :year="currentYear" appName="My Keep" />
+  </div>
+
+  <Dialog
+    v-model:visible="dialogVisible"
+    header="Create Task"
+    modal
+    style="width: 500px"
+  >
+    <TaskCardForm
+      :task="task"
+      :isEdit="false"
+      @save="saveTask"
+      @cancel="dialogVisible = false"
+    />
+  </Dialog>
+</template>
 
 <style scoped>
 .app-layout {

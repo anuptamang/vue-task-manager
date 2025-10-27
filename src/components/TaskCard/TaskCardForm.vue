@@ -1,6 +1,82 @@
 /** * TaskCardForm Component * Handles creation and editing of tasks: * - Title,
 description, status, priority, due date * Emits: * - `save` (Task) → when task
 is saved * - `cancel` → when dialog is closed */
+
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import type { Task } from '../../../generated/prisma';
+import { useTaskStore } from '../../store/taskStore';
+
+import { Button, Calendar, Dropdown, InputText } from 'primevue';
+import Editor from 'primevue/editor';
+import { STATUS_OPTIONS, PRIORITY_OPTIONS } from '../../constants/taskOptions';
+
+const statusOptions = [...STATUS_OPTIONS];
+const priorityOptions = [...PRIORITY_OPTIONS];
+
+const props = defineProps<{
+  task?: Task;
+  isEdit?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'save', task: Task): void;
+  (e: 'cancel'): void;
+}>();
+
+const store = useTaskStore();
+const isEdit = props.isEdit === true;
+const loading = ref(false);
+
+const cloneTask = (task: Partial<Task>): Task => ({
+  id: task.id ?? '',
+  title: task.title ?? '',
+  description: task.description ?? '',
+  status: (task.status as Task['status']) ?? 'todo',
+  priority: (task.priority as Task['priority']) ?? 'medium',
+  dueDate: task.dueDate ? new Date(task.dueDate) : null,
+  createdAt: task.createdAt ? new Date(task.createdAt) : new Date(),
+  updatedAt: task.updatedAt ? new Date(task.updatedAt) : new Date(),
+});
+
+const localTask = ref<Task>(props.task ? cloneTask(props.task) : cloneTask({}));
+
+onMounted(() => {
+  if (isEdit && props.task) {
+    localTask.value = cloneTask(props.task);
+  }
+});
+
+const handleSubmit = async () => {
+  loading.value = true;
+  const payload = {
+    ...localTask.value,
+    dueDate: localTask.value.dueDate
+      ? new Date(localTask.value.dueDate).toISOString()
+      : null,
+  };
+
+  try {
+    let saved: Task;
+    if (props.isEdit) {
+      saved = await store.updateTask(payload as Task);
+    } else {
+      saved = await store.addTask(
+        payload as Omit<Task, 'id' | 'createdAt' | 'updatedAt'>,
+      );
+    }
+    emit('save', saved);
+  } catch (err) {
+    console.error('Failed to save task:', err);
+  } finally {
+    loading.value = false;
+    emit('cancel');
+  }
+};
+
+const handleCancel = () => emit('cancel');
+</script>
+
 <template>
   <div class="p-4">
     <form @submit.prevent="handleSubmit" class="flex flex-col gap-4 max-w-md">
@@ -91,96 +167,3 @@ is saved * - `cancel` → when dialog is closed */
     </form>
   </div>
 </template>
-
-<script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import type { Task } from '../../generated/prisma';
-import { useTaskStore } from '../store/taskStore';
-
-import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
-import Dropdown from 'primevue/dropdown';
-import Editor from 'primevue/editor';
-import InputText from 'primevue/inputtext';
-
-const props = defineProps<{
-  task?: Task;
-  isEdit?: boolean;
-}>();
-
-const emit = defineEmits<{
-  (e: 'save', task: Task): void;
-  (e: 'cancel'): void;
-}>();
-
-const store = useTaskStore();
-const isEdit = props.isEdit === true;
-const loading = ref(false);
-
-const cloneTask = (task: Task): Task => ({
-  ...task,
-  dueDate: task.dueDate ? new Date(task.dueDate) : null,
-});
-
-const localTask = ref<Task>(
-  props.task
-    ? cloneTask(props.task)
-    : {
-        id: '',
-        title: '',
-        description: '',
-        status: 'todo',
-        priority: 'medium',
-        dueDate: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-);
-
-const statusOptions = [
-  { label: 'Todo', value: 'todo' },
-  { label: 'In Progress', value: 'in-progress' },
-  { label: 'Done', value: 'done' },
-];
-
-const priorityOptions = [
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' },
-];
-
-onMounted(() => {
-  if (isEdit && props.task) {
-    localTask.value = cloneTask(props.task);
-  }
-});
-
-const handleSubmit = async () => {
-  loading.value = true;
-  const payload = {
-    ...localTask.value,
-    dueDate: localTask.value.dueDate
-      ? new Date(localTask.value.dueDate).toISOString()
-      : null,
-  };
-
-  try {
-    let saved: Task;
-    if (props.isEdit) {
-      saved = await store.updateTask(payload as Task);
-    } else {
-      saved = await store.addTask(
-        payload as Omit<Task, 'id' | 'createdAt' | 'updatedAt'>,
-      );
-    }
-    emit('save', saved);
-  } catch (err) {
-    console.error('Failed to save task:', err);
-  } finally {
-    loading.value = false;
-    emit('cancel');
-  }
-};
-
-const handleCancel = () => emit('cancel');
-</script>
