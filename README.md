@@ -73,5 +73,24 @@ npm run test:e2e           # E2E tests (Cypress - interactive)
 npm run test:e2e:run       # E2E tests (Cypress - headless)
 npm test                   # Run all tests
 
+### 4. Code Quality
+npm run lint               # ESLint check
+npm run format             # Prettier format
+
+---
+
+## 🔒 Git Hooks (Automatic Code Quality)
+
+The project uses **Husky** and **lint-staged** to automatically ensure code quality:
+
+### Pre-Commit Hook
+- Automatically runs **ESLint** (with auto-fix) on staged files
+- Automatically runs **Prettier** formatting on staged files
+- Only processes changed files (fast!)
+- Blocks commit if unfixable errors exist
+
+### Pre-Push Hook
+- Automatically runs **unit tests** before pushing
+- Blocks push if tests fail
 
 ```
