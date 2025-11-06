@@ -7,29 +7,31 @@ import CardBody from './CardBody.vue';
 import CardFooter from './CardFooter.vue';
 import { useTaskStore } from '../../store/taskStore';
 import type { Task } from '../../../generated/prisma';
+import { useTaskLabels } from '../../composables/useTaskLabels';
+import { useTaskDates } from '../../composables/useTaskDates';
+import { useDialog } from '../../composables/useDialog';
 
 const props = defineProps<{ task: Task }>();
 
 const store = useTaskStore();
 
 const menuRef = ref();
-const dialogVisible = ref(false);
-const deleteDialogVisible = ref(false);
+const editDialog = useDialog();
+const deleteDialog = useDialog();
 const deleting = ref(false);
 const editableTask = ref<Task>({ ...props.task });
 
-/** menu actions */
 const toggleMenu = (event: MouseEvent) => menuRef.value?.toggle(event);
 const editTask = () => {
   editableTask.value = { ...props.task };
-  dialogVisible.value = true;
+  editDialog.open();
 };
-const deleteTask = () => (deleteDialogVisible.value = true);
+const deleteTask = () => deleteDialog.open();
 const confirmDelete = async () => {
   deleting.value = true;
   try {
     await store.deleteTask(props.task.id);
-    deleteDialogVisible.value = false;
+    deleteDialog.close();
   } finally {
     deleting.value = false;
   }
@@ -40,80 +42,24 @@ const menuItems = [
   { label: 'Delete', icon: 'pi pi-trash', command: deleteTask },
 ];
 
-/** derived state */
-const formattedDueDate = computed(() => {
-  if (!props.task.dueDate) return '—';
-  const date = new Date(props.task.dueDate);
-  return date.toISOString().split('T')[0];
-});
-const now = new Date();
-const dueDate = computed(() =>
-  props.task.dueDate ? new Date(props.task.dueDate) : null,
+const { statusLabel, statusSeverity } = useTaskLabels(
+  computed(() => props.task.status),
+  computed(() => props.task.priority),
 );
-const isPastDue = computed(
-  () => !!dueDate.value && dueDate.value.getTime() < now.getTime(),
-);
-const isNearDue = computed(() => {
-  if (!dueDate.value) return false;
-  const diff = dueDate.value.getTime() - now.getTime();
-  return diff > 0 && diff <= 24 * 60 * 60 * 1000;
-});
-const isDueSoonOrOverdue = computed(() => isNearDue.value || isPastDue.value);
 
-const statusSeverity = computed(() => {
-  if (props.task.status === 'done') return 'success';
-  if (props.task.status === 'in-progress') return 'warn';
-  if (isDueSoonOrOverdue.value && props.task.status === 'todo') return 'danger';
-  if (props.task.status === 'todo') return 'info';
-  return 'secondary';
-});
-const statusLabel = computed(() => {
-  switch (props.task.status) {
-    case 'todo':
-      return 'Todo';
-    case 'in-progress':
-      return 'In Progress';
-    case 'done':
-      return 'Done';
-    default:
-      return 'Unknown';
-  }
-});
-const statusClass = computed(() => {
-  if (props.task.status === 'done') return 'border border-green-400';
-  if (props.task.status === 'in-progress') return 'border border-yellow-400';
-  if (
-    isDueSoonOrOverdue.value &&
-    ['todo', 'in-progress'].includes(props.task.status)
-  )
-    return 'border border-red-500';
-  if (props.task.status === 'todo') return 'border border-blue-400';
-  return 'border border-gray-300';
-});
-const prioritySeverity = computed(() => {
-  switch (props.task.priority) {
-    case 'low':
-      return 'secondary';
-    case 'medium':
-      return 'warn';
-    case 'high':
-      return 'danger';
-    default:
-      return 'secondary';
-  }
-});
-const priorityLabel = computed(() => {
-  switch (props.task.priority) {
-    case 'low':
-      return 'Low';
-    case 'medium':
-      return 'Medium';
-    case 'high':
-      return 'High';
-    default:
-      return 'Priority';
-  }
-});
+const {
+  isDueSoonOrOverdue,
+  isPastDue,
+  statusClass,
+  statusSeverity: dynamicStatusSeverity,
+} = useTaskDates(
+  computed(() => props.task.dueDate),
+  computed(() => props.task.status),
+);
+
+const finalStatusSeverity = computed(
+  () => dynamicStatusSeverity.value || statusSeverity.value,
+);
 </script>
 
 <template>
@@ -125,7 +71,7 @@ const priorityLabel = computed(() => {
       <CardHeader
         :title="task.title"
         :status-label="statusLabel"
-        :status-severity="statusSeverity"
+        :status-severity="finalStatusSeverity"
         :show-due-flag="
           ['todo', 'in-progress'].includes(task.status) && isDueSoonOrOverdue
         "
@@ -134,13 +80,7 @@ const priorityLabel = computed(() => {
     </template>
 
     <template #content>
-      <CardBody
-        :status="task.status"
-        :priority-label="priorityLabel"
-        :priority-severity="prioritySeverity"
-        :formatted-due-date="formattedDueDate"
-        :description="task.description"
-      />
+      <CardBody :task="task" />
     </template>
 
     <template #footer>
@@ -152,7 +92,7 @@ const priorityLabel = computed(() => {
 
   <!-- Edit Dialog -->
   <Dialog
-    v-model:visible="dialogVisible"
+    v-model:visible="editDialog.visible.value"
     :header="`Edit Task: ${task.title}`"
     modal
     style="width: 500px"
@@ -160,13 +100,13 @@ const priorityLabel = computed(() => {
     <TaskCardForm
       :task="editableTask"
       :isEdit="true"
-      @cancel="dialogVisible = false"
+      @cancel="editDialog.close"
     />
   </Dialog>
 
   <!-- Delete Dialog -->
   <Dialog
-    v-model:visible="deleteDialogVisible"
+    v-model:visible="deleteDialog.visible.value"
     header="Confirm Delete"
     modal
     style="width: 400px"
@@ -179,8 +119,8 @@ const priorityLabel = computed(() => {
         label="Cancel"
         icon="pi pi-times"
         severity="secondary"
-        @click="deleteDialogVisible = false"
         :disabled="deleting"
+        @click="deleteDialog.close"
       />
       <Button
         label="Delete"

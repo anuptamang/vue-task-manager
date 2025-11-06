@@ -1,35 +1,41 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Tag } from 'primevue';
+import type { Task } from '../../../generated/prisma';
+import { useTaskLabels } from '../../composables/useTaskLabels';
+import { useTaskDates } from '../../composables/useTaskDates';
 
 const props = defineProps<{
-  status: 'todo' | 'in-progress' | 'done' | string;
-  priorityLabel: string;
-  prioritySeverity: 'secondary' | 'warn' | 'danger';
-  formattedDueDate: string;
-  description: string;
+  task: Task;
 }>();
+
+const { statusLabel, priorityLabel, prioritySeverity } = useTaskLabels(
+  computed(() => props.task.status),
+  computed(() => props.task.priority),
+);
+
+const { formattedDueDate } = useTaskDates(
+  computed(() => props.task.dueDate),
+  computed(() => props.task.status),
+);
 </script>
 
 <template>
   <div>
     <p>
-      <b>Status:</b> <span class="capitalize">{{ props.status }}</span>
+      <b>Status:</b> <span class="capitalize">{{ statusLabel }}</span>
     </p>
 
     <p class="flex items-center gap-2">
       <b>Priority:</b>
-      <Tag
-        :value="props.priorityLabel"
-        :severity="props.prioritySeverity"
-        class="ml-0"
-      />
+      <Tag :value="priorityLabel" :severity="prioritySeverity" class="ml-0" />
     </p>
 
     <p>
-      <b>Due:</b> <span>{{ props.formattedDueDate }}</span>
+      <b>Due:</b> <span>{{ formattedDueDate }}</span>
     </p>
 
     <p><b>Description:</b></p>
-    <div v-html="props.description" class="prose"></div>
+    <div v-html="task.description" class="prose"></div>
   </div>
 </template>
