@@ -43,7 +43,7 @@ const clearAll = () => {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-[12px] mb-6 items-center">
+  <div class="flex flex-wrap gap-[12px] mb-6 items-center" data-testid="task-sort-filter">
     <Dropdown
       v-model="selectedStatus"
       :options="statusOptions"
@@ -52,6 +52,7 @@ const clearAll = () => {
       placeholder="Filter by Status"
       class="w-48"
       showClear
+      data-testid="filter-status"
     />
 
     <Dropdown
@@ -62,6 +63,7 @@ const clearAll = () => {
       placeholder="Filter by Priority"
       class="w-48"
       showClear
+      data-testid="filter-priority"
     />
 
     <Dropdown
@@ -71,6 +73,7 @@ const clearAll = () => {
       optionValue="value"
       placeholder="Sort By"
       class="w-48"
+      data-testid="sort-by"
     />
 
     <Button
@@ -78,6 +81,7 @@ const clearAll = () => {
       severity="secondary"
       icon="pi pi-times"
       @click="clearAll"
+      data-testid="clear-filters"
     />
   </div>
 </template>

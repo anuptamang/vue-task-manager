@@ -25,3 +25,18 @@ dist-ssr
 .vercel
 
 /generated/prisma
+
+# Testing
+# Jest coverage reports
+coverage/
+*.lcov
+
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+
+# Jest cache
+.jest-cache/
+
+docs/

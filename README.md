@@ -67,6 +67,11 @@ npm run build
 # Preview production build
 npm run preview
 
+### 3. Run tests
+npm run test:unit          # Unit tests (Jest)
+npm run test:e2e           # E2E tests (Cypress - interactive)
+npm run test:e2e:run       # E2E tests (Cypress - headless)
+npm test                   # Run all tests
 
 
 ```

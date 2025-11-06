@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import VueDevTools from 'vite-plugin-vue-devtools';
@@ -19,9 +19,5 @@ export default defineConfig({
       usePolling: true,
     },
     port: 5173,
-  },
-  test: {
-    include: ['tests/unit/**/*.spec.ts'],
-    environment: 'jsdom',
   },
 });

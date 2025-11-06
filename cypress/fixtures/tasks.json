@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "title": "Test Task",
+    "description": "Test Description",
+    "status": "todo",
+    "priority": "medium",
+    "dueDate": "2025-10-15T00:00:00.000Z",
+    "createdAt": "2025-09-01T00:00:00.000Z",
+    "updatedAt": "2025-09-01T00:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "title": "Alpha Task",
+    "description": "Another test task",
+    "status": "in-progress",
+    "priority": "high",
+    "dueDate": "2025-10-20T00:00:00.000Z",
+    "createdAt": "2025-09-02T00:00:00.000Z",
+    "updatedAt": "2025-09-02T00:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "title": "Bravo Task",
+    "description": "Completed task",
+    "status": "done",
+    "priority": "low",
+    "dueDate": "2025-09-18T00:00:00.000Z",
+    "createdAt": "2025-09-03T00:00:00.000Z",
+    "updatedAt": "2025-09-03T00:00:00.000Z"
+  }
+]
