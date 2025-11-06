@@ -1,8 +1,10 @@
+import type { TaskPriority, TaskStatus } from './taskStatus';
+
 export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'todo' | 'in-progress' | 'done';
-  priority: 'low' | 'medium' | 'high';
+  status: TaskStatus;
+  priority: TaskPriority;
   dueDate: string;
 }
