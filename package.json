@@ -16,8 +16,9 @@
     "test:e2e": "cypress open",
     "test:e2e:run": "cypress run",
     "test:sync-fixtures": "tsx tests/fixtures/generateCypressFixtures.ts",
-    "lint": "eslint . --ext .vue,.ts,.js",
-    "format": "prettier --write ."
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.3",
@@ -67,5 +68,14 @@
     "vite-plugin-vue-devtools": "^7.7.7",
     "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^2.2.10"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,scss,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
